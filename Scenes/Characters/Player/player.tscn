@@ -36,10 +36,10 @@
 [ext_resource type="Script" uid="uid://c0rnip8tg1eie" path="res://Scripts/Characters/Player/PlayerMoveState.cs" id="33_4yec0"]
 [ext_resource type="Texture2D" uid="uid://dlylnuu02yh8y" path="res://Assets/Sprites/Characters/Player/Sliding/Sliding_001.png" id="33_e5xbx"]
 [ext_resource type="Texture2D" uid="uid://dvip14j0oa0lc" path="res://Assets/Sprites/Characters/Player/Sliding/Sliding_002.png" id="34_8uivy"]
-[ext_resource type="Script" uid="uid://cufybt3ywfngk" path="res://Scripts/Characters/StateMachine.cs" id="34_me3gr"]
 [ext_resource type="Texture2D" uid="uid://c75jnjjp75rj3" path="res://Assets/Sprites/Characters/Player/Sliding/Sliding_003.png" id="35_yfcdn"]
 [ext_resource type="Texture2D" uid="uid://8cpgkogmincx" path="res://Assets/Sprites/Characters/Player/Sliding/Sliding_004.png" id="36_68bc3"]
 [ext_resource type="Texture2D" uid="uid://bajjlv0ht2oc4" path="res://Assets/Sprites/Characters/Player/Sliding/Sliding_005.png" id="37_mf3wh"]
+[ext_resource type="PackedScene" uid="uid://xnqgnsppejpc" path="res://Scenes/Characters/state_machine.tscn" id="38_uvgfe"]
 [ext_resource type="Script" uid="uid://cy5cpbxd5ausy" path="res://Scripts/Characters/Player/PlayerDashState.cs" id="39_2qsty"]
 
 [sub_resource type="Animation" id="Animation_h8opa"]
@@ -119,6 +119,7 @@ _data = {
 
 [node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("AnimPlayerNode", "SpriteNode", "StateMachineNode")]
 collision_layer = 2
+collision_mask = 5
 floor_max_angle = 1.55334
 floor_snap_length = 0.2
 script = ExtResource("1_eiaiy")
@@ -136,15 +137,13 @@ libraries = {
 &"": SubResource("AnimationLibrary_xmo1i")
 }
 
-[node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("currentState", "states")]
-script = ExtResource("34_me3gr")
+[node name="StateMachine" parent="." node_paths=PackedStringArray("currentState", "states") instance=ExtResource("38_uvgfe")]
 currentState = NodePath("IdleState")
 states = [NodePath("IdleState"), NodePath("MoveState"), NodePath("DashState")]
 
 [node name="DashState" type="Node" parent="StateMachine" node_paths=PackedStringArray("dashTimerNode")]
 script = ExtResource("39_2qsty")
 dashTimerNode = NodePath("Timer")
-speed = 11.7
 
 [node name="Timer" type="Timer" parent="StateMachine/DashState"]
 wait_time = 0.4

@@ -20,6 +20,7 @@ public partial class PlayerIdleState : PlayerState
 
     protected override void EnterState() 
     {
+        GD.Print("PlayerIdleState::EnterState");
         characterNode.AnimPlayerNode.Play(GameConstants.ANIM_IDLE);
     }
 }

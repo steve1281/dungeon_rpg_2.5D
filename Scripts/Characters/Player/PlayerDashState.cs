@@ -28,6 +28,7 @@ public partial class PlayerDashState : PlayerState
 
     protected override void EnterState()
     {
+        GD.Print("PlayerDashState::EnterState");
         characterNode.AnimPlayerNode.Play(GameConstants.ANIM_DASH);
         characterNode.Velocity = new (
             characterNode.direction.X, 0, characterNode.direction.Y

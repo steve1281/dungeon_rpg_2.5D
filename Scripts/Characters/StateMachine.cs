@@ -8,6 +8,8 @@ public partial class StateMachine : Node
 
     public override void _Ready()
     {
+        GD.Print("StateMachine::_Ready... ", currentState, " ", GetType().Name);
+        DumpDebugStates();
         currentState.Notification(GameConstants.NOTIFICATION_ENTER_STATE);
     }
 
@@ -17,7 +19,6 @@ public partial class StateMachine : Node
         foreach (Node state in states){
             if (state is T) {
                 newState = state;
-                break;
             }
         }
         if (newState == null) { 
@@ -26,9 +27,16 @@ public partial class StateMachine : Node
         }  
 
         currentState.Notification(GameConstants.NOTIFICATION_EXIT_STATE);
-        
         currentState = newState;
         currentState.Notification(GameConstants.NOTIFICATION_ENTER_STATE);
+
+    }
+
+    private void DumpDebugStates() {
+        foreach (Node state in states) {
+            GD.Print(state.GetType().Name);
+
+        }
 
     }
 }
