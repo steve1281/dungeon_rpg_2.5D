@@ -6,6 +6,7 @@ public class GameConstants
     public const string ANIM_DASH = "Dash";
     public const string ANIM_ATTACK = "Attack";
     public const string ANIM_DEATH= "Death";
+    public const string ANIM_PAUSE= "Pause";
 
 
     // Inputs
