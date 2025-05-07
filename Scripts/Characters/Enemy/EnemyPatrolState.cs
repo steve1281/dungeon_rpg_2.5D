@@ -10,7 +10,7 @@ public partial class EnemyPatrolState : EnemyState
 
     protected override void EnterState()
     {
-        GD.Print("EnemyPatrolState::EnterState");
+        GameConstants.DPrint("EnemyPatrolState::EnterState");
         characterNode.AnimPlayerNode.Play(GameConstants.ANIM_MOVE);
         pointIndex  = 1;
         destination = GetPointGlobalPosition(pointIndex);

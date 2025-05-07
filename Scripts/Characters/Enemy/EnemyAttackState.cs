@@ -11,7 +11,7 @@ public partial class EnemyAttackState : EnemyState
 
     protected override void EnterState()
     {
-        GD.Print("EnemyAttackState::EnterState");
+        GameConstants.DPrint("EnemyAttackState::EnterState");
         characterNode.AnimPlayerNode.Play(GameConstants.ANIM_ATTACK);
 
 
@@ -39,7 +39,7 @@ public partial class EnemyAttackState : EnemyState
 
     private void PerformHit() 
     {
-        GD.Print("EnemyAttackState::PerformHit called.");
+        GameConstants.DPrint("EnemyAttackState::PerformHit called.");
         characterNode.ToggleHitbox(false);
         characterNode.HitboxNode.GlobalPosition = targetPosition ;
     }

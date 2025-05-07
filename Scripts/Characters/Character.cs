@@ -13,6 +13,7 @@ public abstract partial class Character: CharacterBody3D
     [Export] public Area3D HurtboxNode {get; private set; }
     [Export] public Area3D HitboxNode {get; private set; }
     [Export] public CollisionShape3D HitboxShapeNode {get; private set; }
+    [Export] public Timer ShaderTimerNode {get; private set;}
 
     [ExportGroup("AI Nodes")]
     [Export] public Path3D PathNode { get; private set; }
@@ -22,20 +23,40 @@ public abstract partial class Character: CharacterBody3D
 
 
     public Vector2 direction = new();
+    private ShaderMaterial shader;
 
     public override void _Ready()
     {
+        shader = (ShaderMaterial)SpriteNode.MaterialOverlay;
         HurtboxNode.AreaEntered += HandleHurtboxEntered;
+        SpriteNode.TextureChanged += HandleTextureChanged;
+        ShaderTimerNode.Timeout += HandleShaderTimeout;
+    }
+
+    private void HandleShaderTimeout()
+    {
+
+        shader.SetShaderParameter("active", false); 
+    }
+
+    private void HandleTextureChanged()
+    {
+        shader.SetShaderParameter("tex", SpriteNode.Texture);
     }
 
     private void HandleHurtboxEntered(Area3D area)
     {
-        //GD.Print("Character::HandleHurtboxEntered:", area.GetType().Name, " ", $"{area.Name} hit");
+        if (area is not IHitBox hitbox)
+        {
+            return;
+        }
+
         StatResource health = GetStatResource(Stat.Health);
-        Character player = area.GetOwner<Character>();
-        //GD.Print("Character::HandleHurtboxEntered:", $"{health.StatValue}");
-        health.StatValue -= player.GetStatResource(Stat.Strength).StatValue;
-        GD.Print("Character::HandleHurtboxEntered:", $"{player.Name}, {health.StatValue}");
+        float damage = hitbox.GetDamage();
+
+        health.StatValue -= damage;
+        shader.SetShaderParameter("active", true); 
+        ShaderTimerNode.Start();
     }
 
     public StatResource GetStatResource(Stat stat)
@@ -54,6 +75,7 @@ public abstract partial class Character: CharacterBody3D
 
     public void ToggleHitbox(bool flag) 
     {
+        GameConstants.DPrint($"Character::ToggleHitBox:{HitboxShapeNode.Disabled}");
         HitboxShapeNode.Disabled = flag;
     }
 }

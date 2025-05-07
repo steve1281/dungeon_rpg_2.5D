@@ -1,4 +1,4 @@
-[gd_scene load_steps=95 format=3 uid="uid://c02ofp18bpasm"]
+[gd_scene load_steps=100 format=3 uid="uid://c02ofp18bpasm"]
 
 [ext_resource type="Texture2D" uid="uid://dkw53tdllp0tv" path="res://Assets/Sprites/Characters/Player/Idle Blinking/Idle Blinking_000.png" id="1_46w32"]
 [ext_resource type="Script" uid="uid://61b0to7wgrl2" path="res://Scripts/Characters/Player/Player.cs" id="1_eiaiy"]
@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://djl5he84o13ua" path="res://Assets/Sprites/Characters/Player/Idle Blinking/Idle Blinking_002.png" id="3_cflke"]
 [ext_resource type="Resource" uid="uid://dtdvi7fjiobm7" path="res://Resources/player_strength_stat.tres" id="3_oslfk"]
 [ext_resource type="Texture2D" uid="uid://cijcsxnt01dox" path="res://Assets/Sprites/Characters/Player/Idle Blinking/Idle Blinking_003.png" id="4_4yec0"]
+[ext_resource type="Shader" uid="uid://bnqwn8217doet" path="res://Shaders/character_hurt.gdshader" id="4_si63r"]
 [ext_resource type="Texture2D" uid="uid://cfhpwjana7m4e" path="res://Assets/Sprites/Characters/Player/Idle Blinking/Idle Blinking_004.png" id="5_me3gr"]
 [ext_resource type="Texture2D" uid="uid://ci13gf6t5pimo" path="res://Assets/Sprites/Characters/Player/Idle Blinking/Idle Blinking_005.png" id="6_2iqoh"]
 [ext_resource type="Texture2D" uid="uid://cobp5qbq6v8pf" path="res://Assets/Sprites/Characters/Player/Idle Blinking/Idle Blinking_006.png" id="7_gii1i"]
@@ -83,7 +84,17 @@
 [ext_resource type="Texture2D" uid="uid://d0qa0xc01xwwt" path="res://Assets/Sprites/Characters/Player/Dying/Dying_012.png" id="75_eau25"]
 [ext_resource type="Texture2D" uid="uid://b2p4h1t2oevg1" path="res://Assets/Sprites/Characters/Player/Dying/Dying_013.png" id="76_rb60l"]
 [ext_resource type="Texture2D" uid="uid://bobmduqw8wty0" path="res://Assets/Sprites/Characters/Player/Dying/Dying_014.png" id="77_wg2mo"]
+[ext_resource type="PackedScene" uid="uid://cakq73phkyc1c" path="res://Scenes/Abilities/bomb.tscn" id="81_oslfk"]
 [ext_resource type="Script" uid="uid://dwpnggg5ek5pn" path="res://Scripts/Characters/Player/PlayerDeathState.cs" id="83_jrg1r"]
+[ext_resource type="PackedScene" uid="uid://ciuv72ms2ux28" path="res://Scenes/Abilities/lightning.tscn" id="85_gtnqr"]
+[ext_resource type="Script" uid="uid://wd7i758sn2lb" path="res://Scripts/Characters/AttackHitbox.cs" id="86_8nlno"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cmja1"]
+render_priority = 1
+shader = ExtResource("4_si63r")
+shader_parameter/active = false
+shader_parameter/flash_color = Color(1, 1, 1, 1)
+shader_parameter/tex = ExtResource("1_46w32")
 
 [sub_resource type="Animation" id="Animation_u0fy1"]
 resource_name = "Attack1"
@@ -242,7 +253,7 @@ _data = {
 [sub_resource type="BoxShape3D" id="BoxShape3D_on6jm"]
 size = Vector3(0.5, 0.5, 0.5)
 
-[node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("AnimPlayerNode", "SpriteNode", "StateMachineNode", "HurtboxNode", "HitboxNode", "HitboxShapeNode")]
+[node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("AnimPlayerNode", "SpriteNode", "StateMachineNode", "HurtboxNode", "HitboxNode", "HitboxShapeNode", "ShaderTimerNode")]
 collision_layer = 2
 collision_mask = 5
 floor_max_angle = 1.55334
@@ -255,9 +266,12 @@ StateMachineNode = NodePath("StateMachine")
 HurtboxNode = NodePath("Hurtbox")
 HitboxNode = NodePath("Hitbox")
 HitboxShapeNode = NodePath("Hitbox/CollisionShape3D")
+ShaderTimerNode = NodePath("ShaderTimer")
 
 [node name="Sprite3D" type="Sprite3D" parent="."]
+material_overlay = SubResource("ShaderMaterial_cmja1")
 pixel_size = 0.0025
+alpha_cut = 2
 texture_filter = 0
 texture = ExtResource("1_46w32")
 
@@ -270,12 +284,19 @@ libraries = {
 currentState = NodePath("IdleState")
 states = [NodePath("IdleState"), NodePath("MoveState"), NodePath("DashState"), NodePath("AttackState"), NodePath("DeathState")]
 
-[node name="DashState" type="Node" parent="StateMachine" node_paths=PackedStringArray("dashTimerNode")]
+[node name="DashState" type="Node" parent="StateMachine" node_paths=PackedStringArray("dashTimerNode", "cooldownTimerNode")]
 script = ExtResource("39_2qsty")
-dashTimerNode = NodePath("Timer")
+dashTimerNode = NodePath("DurationTimer")
+cooldownTimerNode = NodePath("CooldownTimer")
+bombScene = ExtResource("81_oslfk")
 
-[node name="Timer" type="Timer" parent="StateMachine/DashState"]
+[node name="DurationTimer" type="Timer" parent="StateMachine/DashState"]
 wait_time = 0.4
+one_shot = true
+
+[node name="CooldownTimer" type="Timer" parent="StateMachine/DashState"]
+process_mode = 3
+wait_time = 3.0
 one_shot = true
 
 [node name="IdleState" type="Node" parent="StateMachine"]
@@ -287,8 +308,10 @@ script = ExtResource("33_4yec0")
 [node name="AttackState" type="Node" parent="StateMachine" node_paths=PackedStringArray("comboTimerNode")]
 script = ExtResource("66_bikm2")
 comboTimerNode = NodePath("Timer")
+lightningScene = ExtResource("85_gtnqr")
 
 [node name="Timer" type="Timer" parent="StateMachine/AttackState"]
+wait_time = 5.0
 one_shot = true
 
 [node name="DeathState" type="Node" parent="StateMachine"]
@@ -300,7 +323,8 @@ shape = SubResource("CapsuleShape3D_uvgfe")
 
 [node name="Hitbox" type="Area3D" parent="."]
 collision_layer = 2
-collision_mask = 0
+collision_mask = 4
+script = ExtResource("86_8nlno")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Hitbox"]
 shape = SubResource("BoxShape3D_on6jm")
@@ -313,3 +337,7 @@ collision_mask = 4
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Hurtbox"]
 shape = SubResource("CapsuleShape3D_uvgfe")
+
+[node name="ShaderTimer" type="Timer" parent="."]
+wait_time = 0.25
+one_shot = true

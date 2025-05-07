@@ -4,6 +4,7 @@ using System;
 public abstract partial class CharacterState: Node
 {
     protected Character characterNode;
+    public Func<bool> CanTransition = () => true;
 
     public override void _Ready()
     {
@@ -15,7 +16,6 @@ public abstract partial class CharacterState: Node
 
     public override void _Notification(int what)
     {
-        //GD.Print("CharacterState::_Notification ", what, GetType().Name);
         
         base._Notification(what);
 

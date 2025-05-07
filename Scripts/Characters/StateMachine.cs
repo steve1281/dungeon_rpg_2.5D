@@ -5,21 +5,22 @@ using System.Linq;
 public partial class StateMachine : Node
 {
     [Export] private Node currentState;
-    [Export] private Node[] states;
+    [Export] private CharacterState[] states;
 
     public override void _Ready()
     {
-        GD.Print("StateMachine::_Ready... ", currentState, " ", GetType().Name);
+        GameConstants.DPrint($"StateMachine::_Ready... {currentState} is {GetType().Name} ");
         DumpDebugStates();
         currentState.Notification(GameConstants.NOTIFICATION_ENTER_STATE);
     }
 
     public void SwitchState<T>() {
 
-        Node newState = states.Where ( (state) => state is T).FirstOrDefault();
+        CharacterState newState = states.Where ( (state) => state is T).FirstOrDefault();
 
         if (newState == null) { return;}
         if (currentState is T) { return;}
+        if (!newState.CanTransition()) { return;}
 
         currentState.Notification(GameConstants.NOTIFICATION_EXIT_STATE);
         currentState = newState;
@@ -29,7 +30,7 @@ public partial class StateMachine : Node
 
     private void DumpDebugStates() {
         foreach (Node state in states) {
-            GD.Print(state.GetType().Name);
+            GameConstants.DPrint(state.GetType().Name);
 
         }
 

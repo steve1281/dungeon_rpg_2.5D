@@ -9,13 +9,13 @@ public partial class EnemyReturnState : EnemyState
     {
         base._Ready();
         
-        GD.Print("EnemyReturnState::_Ready");
+        GameConstants.DPrint("EnemyReturnState::_Ready");
         destination = GetPointGlobalPosition(0);
     }
 
     protected override void EnterState()
     {
-        GD.Print("EnemyReturnState::EnterState");
+        GameConstants.DPrint("EnemyReturnState::EnterState");
         characterNode.AnimPlayerNode.Play(GameConstants.ANIM_MOVE);
         characterNode.AgentNode.TargetPosition = destination;
         characterNode.ChaseAreaNode.BodyEntered += HandleChaseAreaBodyEntered;

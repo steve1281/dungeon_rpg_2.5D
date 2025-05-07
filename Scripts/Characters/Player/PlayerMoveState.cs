@@ -31,7 +31,7 @@ public partial class PlayerMoveState : PlayerState
 
     protected override void EnterState() 
     {
-        GD.Print("PlayerMoveState::EnterState");
+        GameConstants.DPrint("PlayerMoveState::EnterState");
         characterNode.AnimPlayerNode.Play(GameConstants.ANIM_MOVE);
     }
 }

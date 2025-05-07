@@ -10,7 +10,7 @@ public partial class EnemyIdleState : EnemyState
 
     protected override void EnterState()
     {
-        GD.Print("EnemyIdleState::EnterState");
+        GameConstants.DPrint("EnemyIdleState::EnterState");
         characterNode.AnimPlayerNode.Play(GameConstants.ANIM_IDLE);
         characterNode.ChaseAreaNode.BodyEntered += HandleChaseAreaBodyEntered;
     }

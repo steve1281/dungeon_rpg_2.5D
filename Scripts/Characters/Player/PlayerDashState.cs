@@ -4,6 +4,9 @@ using System;
 public partial class PlayerDashState : PlayerState
 {
     [Export] private Timer dashTimerNode;
+    [Export] private Timer cooldownTimerNode;
+    [Export] private PackedScene bombScene;
+
     [Export(PropertyHint.Range, "0,20,0.1")] private float speed = 10f;
 
 
@@ -11,6 +14,7 @@ public partial class PlayerDashState : PlayerState
     {
         base._Ready();
         dashTimerNode.Timeout += HandleDashTimeout;
+        CanTransition = () => cooldownTimerNode.IsStopped();
     }
 
     public override void _PhysicsProcess(double delta)
@@ -21,6 +25,7 @@ public partial class PlayerDashState : PlayerState
 
     private void HandleDashTimeout()
     {
+        cooldownTimerNode.Start();
         characterNode.Velocity = Vector3.Zero;
         characterNode.StateMachineNode.SwitchState<PlayerIdleState>();
 
@@ -28,7 +33,7 @@ public partial class PlayerDashState : PlayerState
 
     protected override void EnterState()
     {
-        GD.Print("PlayerDashState::EnterState");
+        GameConstants.DPrint("PlayerDashState::EnterState");
         characterNode.AnimPlayerNode.Play(GameConstants.ANIM_DASH);
         characterNode.Velocity = new (
             characterNode.direction.X, 0, characterNode.direction.Y
@@ -40,6 +45,11 @@ public partial class PlayerDashState : PlayerState
         }
         characterNode.Velocity *= speed;
         dashTimerNode.Start();
+
+        Node3D bomb = bombScene.Instantiate<Node3D>();
+        GetTree().CurrentScene.AddChild(bomb);
+        bomb.GlobalPosition = characterNode.GlobalPosition;
+        
     }
 
 }

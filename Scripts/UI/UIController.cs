@@ -21,9 +21,11 @@ public partial class UIController : Control
 
         containers[ContainerType.Start].ButtonNode.Pressed += HandleStartPressed;
         containers[ContainerType.Pause].ButtonNode.Pressed += HandlePausePressed;
+        containers[ContainerType.Reward].ButtonNode.Pressed += HandleRewardPressed;
 
         GameEvents.OnEndGame += HandleEndGame;
         GameEvents.OnVictory += HandleVictory;
+        GameEvents.OnReward += HandleReward;
     }
 
 
@@ -61,7 +63,7 @@ public partial class UIController : Control
 
     private void HandleStartPressed()
     {
-        GD.Print("UIController::HandleStartPressed");
+        GameConstants.DPrint("UIController::HandleStartPressed");
         canPause = true;
         GetTree().Paused = false;
         containers[ContainerType.Start].Visible = false;
@@ -76,6 +78,27 @@ public partial class UIController : Control
         containers[ContainerType.Pause].Visible = false;
         containers[ContainerType.Stats].Visible = true;
 
+    }
+
+    private void HandleReward(RewardResource resource)
+    {
+        canPause = true;
+        GetTree().Paused = true;
+        containers[ContainerType.Stats].Visible = false;
+
+        containers[ContainerType.Reward].Visible = true;
+        containers[ContainerType.Reward].TextureNode.Texture = resource.SpriteTexture;
+        containers[ContainerType.Reward].LabelNode.Text = resource.Description;
+
+
+    }
+
+    private void HandleRewardPressed()
+    {
+        canPause = false;
+        GetTree().Paused = false;
+        containers[ContainerType.Stats].Visible = true;
+        containers[ContainerType.Reward].Visible = false;
     }
 
 }
